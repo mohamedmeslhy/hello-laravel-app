@@ -180,6 +180,7 @@ steps:
         set -e
 
         echo "🔧 Installing kubectl and gke-gcloud-auth-plugin..."
+        sudo apt-get install kubectl google-cloud-cli-gke-gcloud-auth-plugin
         apt-get update -y && apt-get install -y curl tar
         gcloud components install kubectl gke-gcloud-auth-plugin -q
 
