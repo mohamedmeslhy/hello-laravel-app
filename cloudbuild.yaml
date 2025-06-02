@@ -177,20 +177,29 @@ steps:
     args:
       - '-c'
       - |
-        # تثبيت kubectl و gke-gcloud-auth-plugin
-        gcloud components install kubectl gke-gcloud-auth-plugin -q
+        set -e
 
-        # تثبيت Helm
+        # ✅ Install kubectl & gke-gcloud-auth-plugin
+        apt-get update && apt-get install -y apt-transport-https ca-certificates gnupg curl sudo
+
+        echo "Installing kubectl..."
+        gcloud components install kubectl -q
+
+        echo "Installing gke-gcloud-auth-plugin..."
+        gcloud components install gke-gcloud-auth-plugin -q
+
+        echo "Installing Helm..."
         curl -LO https://get.helm.sh/helm-v3.12.0-linux-amd64.tar.gz
         tar -zxvf helm-v3.12.0-linux-amd64.tar.gz
         mv linux-amd64/helm /usr/local/bin/helm
 
-        # الاتصال بالـ GKE
+        echo "Getting cluster credentials..."
         gcloud container clusters get-credentials $_CLUSTER_NAME --region $_REGION --project $PROJECT_ID
 
-        # تشغيل Helm
+        echo "Deploying with Helm..."
         helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
           --namespace $_NAMESPACE \
           --create-namespace \
           --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
           --set image.tag=$_TAG
+
