@@ -159,7 +159,7 @@ steps:
         '$PROJECT_ID'
       ]
 
-  - name: 'gcr.io/k8s-skaffold/helm'
+  - name: 'alpine/helm:3.12.0'
     id: 'Helm Deploy'
     entrypoint: 'sh'
     args:
