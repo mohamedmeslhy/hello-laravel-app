@@ -94,16 +94,12 @@
 
 # images:
 #   - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG'
-options:
-  logging: CLOUD_LOGGING_ONLY
-
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/hello-world/laravel-app', '.']
+    args: ['build', '-t', 'me-central2-docker.pkg.dev/hello-world/hello-world-app/laravel-app', '.']
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/hello-world/laravel-app']
+    args: ['push', 'me-central2-docker.pkg.dev/hello-world/hello-world-app/laravel-app']
 
-
-images:
-  - 'me-central1-docker.pkg.dev/hello-world/laravel/laravel-app:latest'
+options:
+  logging: CLOUD_LOGGING_ONLY
