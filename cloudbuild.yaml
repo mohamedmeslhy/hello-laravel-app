@@ -159,7 +159,7 @@ steps:
         '$PROJECT_ID'
       ]
 
-  - name: 'gcr.io/cloud-builders/kubectl'
+  - name: 'gcr.io/double-vehicle-417323/cloud-builders-helm'
     id: 'Helm Deploy'
     entrypoint: 'sh'
     args:
