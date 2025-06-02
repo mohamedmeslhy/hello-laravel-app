@@ -97,13 +97,16 @@
 options:
   logging: CLOUD_LOGGING_ONLY
 
+substitutions:
+  _TAG: '${BUILD_ID}'
+
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       [
         'build',
         '-t',
-        'me-central2-docker.pkg.dev/double-vehicle-417323/hello-world-app/laravel-app:latest',
+        'me-central2-docker.pkg.dev/double-vehicle-417323/hello-world-app/laravel-app:${_TAG}',
         '.'
       ]
 
@@ -111,5 +114,19 @@ steps:
     args:
       [
         'push',
-        'me-central2-docker.pkg.dev/double-vehicle-417323/hello-world-app/laravel-app:latest'
+        'me-central2-docker.pkg.dev/double-vehicle-417323/hello-world-app/laravel-app:${_TAG}'
       ]
+
+  - name: 'gcr.io/cloud-builders/git'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e
+        echo "Cloning repo..."
+        git clone https://mohamedmeslhy:${_GIT_TOKEN}@github.com/mohamedmeslhy/laravel-chart.git
+        cd laravel-chart
+        echo "Updating tag in values.yaml to ${_TAG} ..."
+        sed -i "s/^\(\s*tag:\s*\).*/\1${_TAG}/" values.yaml
+        echo "Updated values.yaml:"
+        grep 'tag:' values.yaml
