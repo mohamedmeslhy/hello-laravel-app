@@ -170,21 +170,27 @@ steps:
   #         --create-namespace \
   #         --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
   #         --set image.tag=$_TAG
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:latest'
     id: 'Helm Deploy'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         apt-get update && apt-get install -y curl tar
+
+        # ✅ تثبيت helm
         curl -LO https://get.helm.sh/helm-v3.12.0-linux-amd64.tar.gz
         tar -zxvf helm-v3.12.0-linux-amd64.tar.gz
         mv linux-amd64/helm /usr/local/bin/helm
 
-        # Authenticate to GKE
+        # ✅ تثبيت gke-gcloud-auth-plugin
+        curl -sSL https://github.com/GoogleCloudPlatform/k8s-authenticator/releases/download/v0.6.2/gke-gcloud-auth-plugin_linux_amd64 -o /usr/local/bin/gke-gcloud-auth-plugin
+        chmod +x /usr/local/bin/gke-gcloud-auth-plugin
+
+        # ✅ الاتصال بالـ GKE Cluster
         gcloud container clusters get-credentials $_CLUSTER_NAME --region $_REGION --project $PROJECT_ID
 
-        # Deploy
+        # ✅ تشغيل helm
         helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
           --namespace $_NAMESPACE \
           --create-namespace \
