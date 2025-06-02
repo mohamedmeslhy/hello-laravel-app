@@ -191,13 +191,13 @@ steps:
         mv linux-amd64/helm /usr/local/bin/helm
         helm version
 
-        # echo "Getting cluster credentials..."
-        # gcloud container clusters get-credentials $_CLUSTER_NAME --region $_REGION --project $PROJECT_ID
+        echo "Getting cluster credentials..."
+        gcloud container clusters get-credentials $_CLUSTER_NAME --region $_REGION --project $PROJECT_ID
 
-        # echo "Deploying with Helm..."
-        # helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
-        #   --namespace $_NAMESPACE \
-        #   --create-namespace \
-        #   --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
-        #   --set image.tag=$_TAG
+        echo "Deploying with Helm..."
+        helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
+          --namespace $_NAMESPACE \
+          --create-namespace \
+          --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
+          --set image.tag=$_TAG
 
