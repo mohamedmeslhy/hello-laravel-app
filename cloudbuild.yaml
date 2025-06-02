@@ -188,7 +188,7 @@ steps:
         chmod +x /usr/local/bin/gke-gcloud-auth-plugin
 
         # ✅ الاتصال بالـ GKE Cluster
-        gcloud container clusters get-credentials $_CLUSTER_NAME --region $_REGION --project $PROJECT_ID
+        gcloud container clusters get-credentials $_CLUSTER_NAME --region $_REGION --project double-vehicle-417323
 
         # ✅ تشغيل helm
         helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
