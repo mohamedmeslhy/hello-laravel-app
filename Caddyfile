@@ -1,0 +1,24 @@
+{
+    frankenphp
+    http_port 80
+    auto_https off
+}
+
+:80 {
+    root * /app/public
+    php_server {
+        try_files {path} {path}/ /index.php?{query}
+    }
+    file_server
+    
+    # Handle Laravel routing properly
+    @notFound {
+        file {path} /index.php
+    }
+    rewrite @notFound /index.php?{query}
+    
+    header {
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+    }
+}
