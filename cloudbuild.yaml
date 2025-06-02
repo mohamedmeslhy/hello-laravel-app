@@ -159,7 +159,7 @@ steps:
         '$PROJECT_ID'
       ]
 
-  - name: 'gcr.io/k8s-skaffold/helm:2.16.0'
+  - name: 'gcr.io/cloud-builders/kubectl'
     id: 'Helm Deploy'
     entrypoint: 'sh'
     args:
