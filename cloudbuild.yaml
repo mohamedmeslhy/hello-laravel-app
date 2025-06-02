@@ -159,7 +159,18 @@ steps:
         '$PROJECT_ID'
       ]
 
-  - name: 'gcr.io/double-vehicle-417323/cloud-builders-helm'
+  # - name: 'gcr.io/k8s-skaffold/helm'
+  #   id: 'Helm Deploy'
+  #   entrypoint: 'sh'
+  #   args:
+  #     - '-c'
+  #     - |
+  #       helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
+  #         --namespace $_NAMESPACE \
+  #         --create-namespace \
+  #         --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
+  #         --set image.tag=$_TAG
+  - name: 'alpine/helm:3.12.0'
     id: 'Helm Deploy'
     entrypoint: 'sh'
     args:
