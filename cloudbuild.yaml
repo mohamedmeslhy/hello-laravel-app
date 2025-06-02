@@ -130,3 +130,6 @@ steps:
         sed -i "s/^\(\s*tag:\s*\).*/\1${_TAG}/" values.yaml
         echo "Updated values.yaml:"
         grep 'tag:' values.yaml
+        git add .
+        git commit -m "edited images tag value"
+        git push origin main
