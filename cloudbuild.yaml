@@ -99,10 +99,10 @@ options:
 
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/PROJECT_ID/laravel-app', '.']
+    args: ['build', '-t', 'gcr.io/hello-world/laravel-app', '.']
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/PROJECT_ID/laravel-app']
+    args: ['push', 'gcr.io/hello-world/laravel-app']
 
 
 images:
