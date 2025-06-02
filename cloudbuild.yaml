@@ -109,6 +109,7 @@ substitutions:
   _NAMESPACE: 'laravel-test'
   _HELM_CHART_PATH: 'laravel-chart'
   _ENV: 'production'  
+  _PROJECT_ID: 'double-vehicle-417323'
 
 steps:
   - name: 'gcr.io/cloud-builders/docker'
@@ -159,14 +160,24 @@ steps:
         '$PROJECT_ID'
       ]
 
-  - name: 'gcr.io/k8s-skaffold/helm'
+  # - name: 'gcr.io/cloud-builders/helm'
+  #   id: 'Helm Deploy'
+  #   entrypoint: 'sh'
+  #   args:
+  #     - '-c'
+  #     - |
+  #       helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
+  #         --namespace $_NAMESPACE \
+  #         --create-namespace \
+  #         --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
+  #         --set image.tag=$_TAG
+  - name: 'gcr.io/cloud-builders/helm'
     id: 'Helm Deploy'
-    entrypoint: 'sh'
     args:
-      - '-c'
-      - |
-        helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
-          --namespace $_NAMESPACE \
-          --create-namespace \
-          --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
-          --set image.tag=$_TAG
+      [
+        'upgrade', '--install', '$_RELEASE_NAME', '$_HELM_CHART_PATH',
+        '--namespace', '$_NAMESPACE',
+        '--create-namespace',
+        '--set', 'image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME',
+        '--set', 'image.tag=$_TAG'
+      ]
