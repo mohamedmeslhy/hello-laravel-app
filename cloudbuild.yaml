@@ -100,6 +100,16 @@ options:
 substitutions:
   _TAG: '${BUILD_ID}'
 
+  _REGION: 'me-central2'
+  _REPO_NAME: 'hello-world-app'
+  _IMAGE_NAME: 'laravel-app'
+  _CLUSTER_NAME: 'noot-app'
+  _CLUSTER_ZONE: 'me-central2'
+  _RELEASE_NAME: 'laravel-app'
+  _NAMESPACE: 'laravel-test'
+  _HELM_CHART_PATH: 'laravel-chart'
+  _ENV: 'production'  
+
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
@@ -135,3 +145,28 @@ steps:
         git add .
         git commit -m "edited images tag value"
         git push origin main
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Get GKE Credentials'
+    args:
+      [
+        'container',
+        'clusters',
+        'get-credentials',
+        '$_CLUSTER_NAME',
+        '--zone',
+        '$_CLUSTER_ZONE',
+        '--project',
+        '$PROJECT_ID'
+      ]
+
+  - name: 'gcr.io/k8s-skaffold/helm'
+    id: 'Helm Deploy'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
+          --namespace $_NAMESPACE \
+          --create-namespace \
+          --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
+          --set image.tag=$_TAG
