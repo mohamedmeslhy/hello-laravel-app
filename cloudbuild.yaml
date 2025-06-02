@@ -1,96 +1,107 @@
-substitutions:
-  _REGION: 'us-central1'
-  _REPO_NAME: 'laravel-repo'
-  _IMAGE_NAME: 'laravel-app'
-  _TAG: 'latest'  # $SHORT_SHA immutable tags
-  _CLUSTER_NAME: 'laravel-cluster'
-  _CLUSTER_ZONE: 'us-central1-c'
-  _RELEASE_NAME: 'my-release'
-  _NAMESPACE: 'default'
-  _HELM_CHART_PATH: './helm/laravel-chart'
-  _ENV: 'production'  # env type
+# substitutions:
+#   _REGION: 'us-central1'
+#   _REPO_NAME: 'laravel-repo'
+#   _IMAGE_NAME: 'laravel-app'
+#   _TAG: 'latest'  # $SHORT_SHA immutable tags
+#   _CLUSTER_NAME: 'laravel-cluster'
+#   _CLUSTER_ZONE: 'us-central1-c'
+#   _RELEASE_NAME: 'my-release'
+#   _NAMESPACE: 'default'
+#   _HELM_CHART_PATH: './helm/laravel-chart'
+#   _ENV: 'production'  # env type
 
+# steps:
+#   # Step 0: Prepare SSH Key and secrets
+#   - name: gcr.io/cloud-builders/gcloud
+#     id: "Prepare Secrets Data"
+#     waitFor: ['-']  
+#     entrypoint: 'bash'
+#     args:
+#       - '-c'
+#       - |
+#         echo "📦 Preparing secrets and SSH key..."
+#         mkdir -p /root/.ssh ./ssh
+
+#         gcloud secrets versions access latest --secret=Github-Noot-App > /root/.ssh/id_github
+#         gcloud secrets versions access latest --secret=env_${_ENV} > ./ssh/env
+#         gcloud secrets versions access latest --secret=gcs-noot-app-prod-std-${_ENV} > ./ssh/gcs-noot-app-prod-std.json
+#         cp ./ssh/gcs-noot-app-prod-std.json ./gcs-noot-app-prod-std.json
+#         gcloud secrets versions access latest --secret=composer-auth > ./ssh/composer-auth.json
+
+#         chmod 600 /root/.ssh/id_github
+#         cat <<EOF > /root/.ssh/config
+#         Host github
+#           Hostname github.com
+#           User git
+#           IdentityFile /root/.ssh/id_github
+#           StrictHostKeyChecking no
+#         EOF
+#         chmod 600 /root/.ssh/config
+#         ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
+
+#         echo "✅ SSH & Secrets setup complete."
+#         ls -l /root/.ssh
+#         ls -l ./ssh
+
+#   # Step 1: Build Docker image
+#   - name: 'gcr.io/cloud-builders/docker'
+#     id: 'Build Docker Image'
+#     waitFor: ['Prepare Secrets Data']
+#     args:
+#       [
+#         'build',
+#         '-t',
+#         '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG',
+#         '.'
+#       ]
+
+#   # Step 2: Push image to Artifact Registry
+#   - name: 'gcr.io/cloud-builders/docker'
+#     id: 'Push to Artifact Registry'
+#     args:
+#       [
+#         'push',
+#         '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG'
+#       ]
+
+#   # Step 3: Get GKE credentials
+#   # - name: 'gcr.io/cloud-builders/gcloud'
+#   #   id: 'Get GKE Credentials'
+#   #   args:
+#   #     [
+#   #       'container',
+#   #       'clusters',
+#   #       'get-credentials',
+#   #       '$_CLUSTER_NAME',
+#   #       '--zone',
+#   #       '$_CLUSTER_ZONE',
+#   #       '--project',
+#   #       '$PROJECT_ID'
+#   #     ]
+
+#   # Step 4: Deploy using Helm
+#   # - name: 'gcr.io/k8s-skaffold/helm'
+#   #   id: 'Helm Deploy'
+#   #   entrypoint: 'sh'
+#   #   args:
+#   #     - '-c'
+#   #     - |
+#   #       helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
+#   #         --namespace $_NAMESPACE \
+#   #         --create-namespace \
+#   #         --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
+#   #         --set image.tag=$_TAG
+
+# images:
+#   - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG'
 steps:
-  # Step 0: Prepare SSH Key and secrets
-  - name: gcr.io/cloud-builders/gcloud
-    id: "Prepare Secrets Data"
-    waitFor: ['-']  
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        echo "📦 Preparing secrets and SSH key..."
-        mkdir -p /root/.ssh ./ssh
-
-        gcloud secrets versions access latest --secret=Github-Noot-App > /root/.ssh/id_github
-        gcloud secrets versions access latest --secret=env_${_ENV} > ./ssh/env
-        gcloud secrets versions access latest --secret=gcs-noot-app-prod-std-${_ENV} > ./ssh/gcs-noot-app-prod-std.json
-        cp ./ssh/gcs-noot-app-prod-std.json ./gcs-noot-app-prod-std.json
-        gcloud secrets versions access latest --secret=composer-auth > ./ssh/composer-auth.json
-
-        chmod 600 /root/.ssh/id_github
-        cat <<EOF > /root/.ssh/config
-        Host github
-          Hostname github.com
-          User git
-          IdentityFile /root/.ssh/id_github
-          StrictHostKeyChecking no
-        EOF
-        chmod 600 /root/.ssh/config
-        ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts
-
-        echo "✅ SSH & Secrets setup complete."
-        ls -l /root/.ssh
-        ls -l ./ssh
-
-  # Step 1: Build Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'Build Docker Image'
-    waitFor: ['Prepare Secrets Data']
-    args:
-      [
-        'build',
-        '-t',
-        '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG',
-        '.'
-      ]
+    id: 'Build Laravel Docker Image'
+    args: ['build', '-t', 'me-central1-docker.pkg.dev/hello-world/laravel/laravel-app:latest', '.']
 
-  # Step 2: Push image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'Push to Artifact Registry'
-    args:
-      [
-        'push',
-        '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG'
-      ]
-
-  # Step 3: Get GKE credentials
-  # - name: 'gcr.io/cloud-builders/gcloud'
-  #   id: 'Get GKE Credentials'
-  #   args:
-  #     [
-  #       'container',
-  #       'clusters',
-  #       'get-credentials',
-  #       '$_CLUSTER_NAME',
-  #       '--zone',
-  #       '$_CLUSTER_ZONE',
-  #       '--project',
-  #       '$PROJECT_ID'
-  #     ]
-
-  # Step 4: Deploy using Helm
-  # - name: 'gcr.io/k8s-skaffold/helm'
-  #   id: 'Helm Deploy'
-  #   entrypoint: 'sh'
-  #   args:
-  #     - '-c'
-  #     - |
-  #       helm upgrade --install $_RELEASE_NAME $_HELM_CHART_PATH \
-  #         --namespace $_NAMESPACE \
-  #         --create-namespace \
-  #         --set image.repository=$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME \
-  #         --set image.tag=$_TAG
+    id: 'Push Docker Image'
+    args: ['push', 'me-central1-docker.pkg.dev/hello-world/laravel/laravel-app:latest']
 
 images:
-  - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO_NAME/$_IMAGE_NAME:$_TAG'
+  - 'me-central1-docker.pkg.dev/hello-world/laravel/laravel-app:latest'
